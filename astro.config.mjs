@@ -2,19 +2,18 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
-// https://astro.build/config
 export default defineConfig({
   site: "https://ion.ndjp.net",
   
-  // 关键修复：指定子路径为 /CKM，确保打包后的 JS/CSS 资源能够正确寻址
-  base: "/CKM",
+  // 1. 确保这里的子路径和你的 GitHub 仓库名/部署子目录完全一致
+  base: "/CKM", 
 
-  // 构建输出目录
   outDir: "dist",
   
-  // 输出 .html 文件（如 overview.html），保持与原项目 URL 结构一致
   build: {
-    format: "file",
+    // 2. 关键修改：改回 directory。
+    // 这会让打包产物变成 /overview/index.html，解决静态托管平台刷新 404 的问题
+    format: "directory", 
   },
   vite: {
     plugins: [tailwindcss()],

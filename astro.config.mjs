@@ -28,7 +28,7 @@ function getBase() {
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://ckm.ndjp.net",
+  site: "ion.ndjp.net",
   // 动态 base：线上自动适配仓库名，本地为 "/"
   base: getBase(),
   // 构建输出目录

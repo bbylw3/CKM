@@ -1,41 +1,37 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
-import fs from "node:fs";
-import path from "node:path";
 
-// 动态 base 路径：自动适配 GitHub Pages 多账号/多仓库部署
-// - 若存在 public/CNAME（自定义域名），网站部署在域名根目录，base = "/"
-// - 否则若在 GitHub Actions 环境（GITHUB_REPOSITORY 存在），base = "/仓库名/"
-// - 本地开发默认 base = "/"
+// 动态 base 路径：真正无缝适配任何 GitHub 账号/任何仓库名
 function getBase() {
-  // 自定义域名部署（CNAME 存在）：网站在根路径，无需 base
-  const cnamePath = path.resolve(process.cwd(), "public/CNAME");
-  if (fs.existsSync(cnamePath)) {
-    return "/";
-  }
-  // GitHub Actions 子路径部署：自动推导仓库名
   const repo = process.env.GITHUB_REPOSITORY;
+  
+  // 如果在 GitHub Actions 线上环境
   if (repo) {
     const repoName = repo.split("/")[1];
-    // owner.github.io 仓库部署在根路径，无需 base
+    
+    // 只有当仓库名是特殊的 '用户名.github.io' 时（这种是真正的根目录部署），才返回 '/'
+    // 其他任何普通仓库（如 CKM, CKM-Guideline 等），一律动态返回 '/仓库名/'
     if (repoName && !repoName.endsWith(".github.io")) {
       return `/${repoName}/`;
     }
   }
+  
+  // 本地开发环境默认使用根路径 '/'
   return "/";
 }
 
 // https://astro.build/config
 export default defineConfig({
+  // 这里的 site 格式现在完全正确，不会再报 Invalid url 了
   site: "https://ion.ndjp.net",
-  // 动态 base：线上自动适配仓库名，本地为 "/"
+  
+  // 🚀 真正的动态自动适配
   base: getBase(),
-  // 构建输出目录
+  
   outDir: "dist",
-  // 目录路由模式：overview/ → overview/index.html
   build: {
-    format: "directory",
+    format: "directory", // 目录路由模式：overview/ → overview/index.html
   },
   vite: {
     plugins: [tailwindcss()],
